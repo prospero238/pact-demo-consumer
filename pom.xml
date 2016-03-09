@@ -54,7 +54,7 @@
                 <artifactId>pactbroker-maven-plugin</artifactId>
                 <version>0.0.5</version>
                 <configuration>
-                    <brokerUrl>http://localhost:8383</brokerUrl>
+                    <brokerUrl>${pact.broker.url}</brokerUrl>
                     <pacts>target/pacts</pacts>
                 </configuration>
                 <executions>
@@ -72,7 +72,7 @@
                 <artifactId>pact-jvm-provider-maven_2.11</artifactId>
                 <version>3.2.4</version>
                  <configuration>
-                     <pactBrokerUrl>http://localhost:8383</pactBrokerUrl>
+                     <pactBrokerUrl>${pact.broker.url}</pactBrokerUrl>
                     <serviceProviders>
                         <!-- You can define as many as you need, but each must have a unique name -->
                         <serviceProvider>
@@ -95,4 +95,8 @@
             </plugin>
         </plugins>
     </build>
+    <properties>
+        <pact.broker.url>http://10.0.2.2:8383</pact.broker.url>
+    </properties>
+
 </project>
