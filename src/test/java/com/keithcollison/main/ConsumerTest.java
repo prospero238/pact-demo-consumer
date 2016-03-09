@@ -56,7 +56,7 @@ public class ConsumerTest {
 
     @Test
     @PactVerification(SHAPE_PROVIDER)
-    public void runTest() throws IOException {
+    public void runShapeTest() throws IOException {
         Map expectedResponse = new HashMap();
 
         expectedResponse.put("name","circle");
@@ -64,10 +64,10 @@ public class ConsumerTest {
     }
     @Test
     @PactVerification(COLOR_PROVIDER)
-    public void runAltTest() throws IOException {
+    public void runColorTest() throws IOException {
         Map expectedResponse = new HashMap();
 
-        expectedResponse.put("name", "circle");
+        expectedResponse.put("name", "red");
         assertEquals(new ConsumerClient("http://localhost:" + ALT_PORT).getAsMap("/color/red"), expectedResponse);
 
     }

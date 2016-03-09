@@ -15,8 +15,15 @@ public class ConsumerClient {
 
     private String url;
 
+    private String expectedName;
+
     public ConsumerClient(String url) {
         this.url = url;
+    }
+
+    public ConsumerClient(String url, String expectedName) {
+        this.url = url;
+        this.expectedName = expectedName;
     }
 
     public Map getAsMap(String path) throws IOException {
