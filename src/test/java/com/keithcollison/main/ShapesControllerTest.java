@@ -27,7 +27,7 @@ public class ShapesControllerTest {
     @Rule
     public PactProviderRule altProvider = new PactProviderRule("alt_provider", "localhost", ALT_PORT, this);
 
-    @Pact(provider = "alt_provider", consumer = "test_consumer")
+
     public PactFragment createAltFragment(PactDslWithProvider builder) {
 
         return builder
