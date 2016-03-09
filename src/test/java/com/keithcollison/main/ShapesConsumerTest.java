@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class ShapesControllerTest {
+public class ShapesConsumerTest {
 
 
     private static final int ALT_PORT = 8086;
@@ -28,6 +28,7 @@ public class ShapesControllerTest {
     public PactProviderRule altProvider = new PactProviderRule("alt_provider", "localhost", ALT_PORT, this);
 
 
+    @Pact(provider = "alt_provider", consumer = "test_consumer")
     public PactFragment createAltFragment(PactDslWithProvider builder) {
 
         return builder
@@ -60,7 +61,6 @@ public class ShapesControllerTest {
         assertEquals(new ConsumerClient("http://localhost:" + ORIG_PORT).getAsMap("/shape/circle"), expectedResponse);
     }
     @Test
-    @Ignore
     @PactVerification("alt_provider")
     public void runAltTest() throws IOException {
         Map expectedResponse = new HashMap();
