@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -59,6 +60,7 @@ public class ShapesControllerTest {
         assertEquals(new ConsumerClient("http://localhost:" + ORIG_PORT).getAsMap("/shape/circle"), expectedResponse);
     }
     @Test
+    @Ignore
     @PactVerification("alt_provider")
     public void runAltTest() throws IOException {
         Map expectedResponse = new HashMap();
