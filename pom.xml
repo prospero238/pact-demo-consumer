@@ -51,55 +51,61 @@
             <artifactId>spring-boot-actuator</artifactId>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.github.warmuuh</groupId>
-                <artifactId>pactbroker-maven-plugin</artifactId>
-                <version>0.0.5</version>
-                <configuration>
-                    <brokerUrl>${pact.broker.url}</brokerUrl>
-                    <pacts>target/pacts</pacts>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>upload-pacts</goal>
-                        </goals>
-                        <phase>verify</phase>
-                    </execution>
-                </executions>
-
-            </plugin>
-            <plugin>
-                <groupId>au.com.dius</groupId>
-                <artifactId>pact-jvm-provider-maven_2.11</artifactId>
-                <version>3.2.4</version>
-                <configuration>
-                    <pactBrokerUrl>${pact.broker.url}</pactBrokerUrl>
-                    <serviceProviders>
-                        <!-- You can define as many as you need, but each must have a unique name -->
-                        <serviceProvider>
-                            <name>application-service</name>
-                            <stateChangeUrl>http://localhost:8383/state</stateChangeUrl>
-
-                            <!-- All the provider properties are optional, and have sensible defaults (shown below) -->
-                            <protocol>http</protocol>
-                            <host>localhost</host>
-                            <port>8383</port>
-                            <path>/</path>
-                            <pactFileDirectory>target/provider-pacts</pactFileDirectory>
-                        </serviceProvider>
-                    </serviceProviders>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
     <profiles>
+        <profile>
+            <id>consumer</id>
+            <properties>
+                <start-class>com.keithcollison.ColorProvider</start-class>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.warmuuh</groupId>
+                        <artifactId>pactbroker-maven-plugin</artifactId>
+                        <version>0.0.5</version>
+                        <configuration>
+                            <brokerUrl>${pact.broker.url}</brokerUrl>
+                            <pacts>target/pacts</pacts>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>upload-pacts</goal>
+                                </goals>
+                                <phase>verify</phase>
+                            </execution>
+                        </executions>
+
+                    </plugin>
+                    <plugin>
+                        <groupId>au.com.dius</groupId>
+                        <artifactId>pact-jvm-provider-maven_2.11</artifactId>
+                        <version>3.2.4</version>
+                        <configuration>
+                            <pactBrokerUrl>${pact.broker.url}</pactBrokerUrl>
+                            <serviceProviders>
+                                <!-- You can define as many as you need, but each must have a unique name -->
+                                <serviceProvider>
+                                    <name>application-service</name>
+                                    <stateChangeUrl>http://localhost:8383/state</stateChangeUrl>
+
+                                    <!-- All the provider properties are optional, and have sensible defaults (shown below) -->
+                                    <protocol>http</protocol>
+                                    <host>localhost</host>
+                                    <port>8383</port>
+                                    <path>/</path>
+                                    <pactFileDirectory>target/provider-pacts</pactFileDirectory>
+                                </serviceProvider>
+                            </serviceProviders>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>provider</id>
             <build>
@@ -188,6 +194,7 @@
             <properties>
                 <server.port>9081</server.port>
                 <provider.name>shape-provider</provider.name>
+                <start-class>com.keithcollison.ShapeProvider</start-class>
             </properties>
         </profile>
 
@@ -197,6 +204,7 @@
             <properties>
                 <server.port>9081</server.port>
                 <provider.name>color-provider</provider.name>
+                <start-class>com.keithcollison.ColorProvider</start-class>
             </properties>
         </profile>
     </profiles>
