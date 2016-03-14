@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.keithcollison</groupId>
-    <artifactId>consumer-pact-example</artifactId>
+    <artifactId>consumer-and-provider</artifactId>
+    <description>One app to stand-in as a consumer and two providers.</description>
     <version>1.0.0-SNAPSHOT</version>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.3.3.RELEASE</version>
     </parent>
+    <properties>
+        <pact.broker.url>http://10.0.2.2:8383</pact.broker.url>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -45,7 +50,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-actuator</artifactId>
         </dependency>
-
     </dependencies>
     <build>
         <plugins>
@@ -71,8 +75,8 @@
                 <groupId>au.com.dius</groupId>
                 <artifactId>pact-jvm-provider-maven_2.11</artifactId>
                 <version>3.2.4</version>
-                 <configuration>
-                     <pactBrokerUrl>${pact.broker.url}</pactBrokerUrl>
+                <configuration>
+                    <pactBrokerUrl>${pact.broker.url}</pactBrokerUrl>
                     <serviceProviders>
                         <!-- You can define as many as you need, but each must have a unique name -->
                         <serviceProvider>
@@ -95,8 +99,105 @@
             </plugin>
         </plugins>
     </build>
-    <properties>
-        <pact.broker.url>http://10.0.2.2:8383</pact.broker.url>
-    </properties>
+    <profiles>
+        <profile>
+            <id>provider</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.warmuuh</groupId>
+                        <artifactId>pactbroker-maven-plugin</artifactId>
+                        <version>0.0.5</version>
+                        <configuration>
+                            <brokerUrl>${pact.broker.url}</brokerUrl>
+                            <pacts>target/provider-pacts</pacts>
+                            <provider>${provider.name}</provider>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>download-pacts</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>au.com.dius</groupId>
+                        <artifactId>pact-jvm-provider-maven_2.11</artifactId>
+                        <version>3.2.4</version>
+                        <configuration>
+                            <pactBrokerUrl>${pact.broker.url}</pactBrokerUrl>
+                            <serviceProviders>
+                                <serviceProvider>
+                                    <name>${provider.name}</name>
+                                    <stateChangeUrl>http://localhost:${server.port}/state</stateChangeUrl>
+                                    <protocol>http</protocol>
+                                    <host>localhost</host>
+                                    <port>${server.port}</port>
+                                    <path>/</path>
+                                    <pactFileDirectory>target/provider-pacts</pactFileDirectory>
+                                </serviceProvider>
+                            </serviceProviders>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>integration-test</phase>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <fork>true</fork>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>start</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>start</goal>
+                                </goals>
+                                <configuration>
+                                    <jvmArguments>-Dserver.port=${server.port}</jvmArguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <properties>
+                <server.port>9081</server.port>
+                <provider.name>shape-provider</provider.name>
+            </properties>
+        </profile>
+        <profile>
+            <id>shape-provider</id>
+            <!-- intended to be used in conjunction with provider profile -->
+            <properties>
+                <server.port>9081</server.port>
+                <provider.name>shape-provider</provider.name>
+            </properties>
+        </profile>
 
+        <profile>
+            <id>color-provider</id>
+            <!-- intended to be used in conjunction with provider profile -->
+            <properties>
+                <server.port>9081</server.port>
+                <provider.name>color-provider</provider.name>
+            </properties>
+        </profile>
+    </profiles>
 </project>
