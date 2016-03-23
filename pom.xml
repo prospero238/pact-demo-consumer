@@ -13,6 +13,7 @@
     </parent>
     <properties>
         <pact.broker.url>http://10.0.2.2:8383</pact.broker.url>
+        <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
     </properties>
     <dependencies>
         <dependency>
@@ -51,6 +52,47 @@
             <artifactId>spring-boot-actuator</artifactId>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.10</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- Run with:
+                    mvn bash:run
+                    mvn install
+                -->
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>bash-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>test</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <script>
+                        echo "${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${maven.build.timestamp}"
+
+                    </script>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <profiles>
         <profile>
             <id>consumer</id>
@@ -59,6 +101,7 @@
             </properties>
             <build>
                 <plugins>
+
                     <plugin>
                         <groupId>com.github.warmuuh</groupId>
                         <artifactId>pactbroker-maven-plugin</artifactId>
@@ -66,6 +109,8 @@
                         <configuration>
                             <brokerUrl>${pact.broker.url}</brokerUrl>
                             <pacts>target/pacts</pacts>
+                            <consumerVersion>
+                                ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${maven.build.timestamp}</consumerVersion>
                         </configuration>
                         <executions>
                             <execution>
@@ -75,7 +120,6 @@
                                 <phase>verify</phase>
                             </execution>
                         </executions>
-
                     </plugin>
                     <plugin>
                         <groupId>au.com.dius</groupId>
@@ -111,6 +155,27 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>1.10</version>
+                        <executions>
+                            <execution>
+                                <id>find-port</id>
+                                <goals>
+                                    <goal>reserve-network-port</goal>
+                                </goals>
+                                <phase>pre-integration-test</phase>
+                                <configuration>
+                                    <portNames>
+                                        <portName>spring.boot.port</portName>
+                                        <portName>jmx.port</portName>
+                                    </portNames>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
                         <groupId>com.github.warmuuh</groupId>
                         <artifactId>pactbroker-maven-plugin</artifactId>
                         <version>0.0.5</version>
@@ -137,10 +202,10 @@
                             <serviceProviders>
                                 <serviceProvider>
                                     <name>${provider.name}</name>
-                                    <stateChangeUrl>http://localhost:${server.port}/state</stateChangeUrl>
+                                    <stateChangeUrl>http://localhost:${spring.boot.port}/state</stateChangeUrl>
                                     <protocol>http</protocol>
                                     <host>localhost</host>
-                                    <port>${server.port}</port>
+                                    <port>${spring.boot.port}</port>
                                     <path>/</path>
                                     <pactFileDirectory>target/provider-pacts</pactFileDirectory>
                                 </serviceProvider>
@@ -169,7 +234,7 @@
                                     <goal>start</goal>
                                 </goals>
                                 <configuration>
-                                    <jvmArguments>-Dserver.port=${server.port}</jvmArguments>
+                                    <jvmArguments>-Dserver.port=${spring.boot.port} -Dcom.sun.management.jmxremote.port=${jmx.port}</jvmArguments>
                                 </configuration>
                             </execution>
                             <execution>
@@ -184,7 +249,6 @@
                 </plugins>
             </build>
             <properties>
-                <server.port>9081</server.port>
                 <provider.name>shape-provider</provider.name>
             </properties>
         </profile>
@@ -192,7 +256,6 @@
             <id>shape-provider</id>
             <!-- intended to be used in conjunction with provider profile -->
             <properties>
-                <server.port>9081</server.port>
                 <provider.name>shape-provider</provider.name>
                 <start-class>com.keithcollison.ShapeProvider</start-class>
             </properties>
@@ -202,7 +265,6 @@
             <id>color-provider</id>
             <!-- intended to be used in conjunction with provider profile -->
             <properties>
-                <server.port>9081</server.port>
                 <provider.name>color-provider</provider.name>
                 <start-class>com.keithcollison.ColorProvider</start-class>
             </properties>
