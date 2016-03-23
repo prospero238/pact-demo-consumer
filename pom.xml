@@ -235,6 +235,8 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
                             <fork>true</fork>
+                            <jvmArguments>-Dserver.port=${spring.boot.port}</jvmArguments>
+                            <jmxPort>${jmx.port}</jmxPort>
                         </configuration>
                         <executions>
                             <execution>
@@ -243,10 +245,6 @@
                                 <goals>
                                     <goal>start</goal>
                                 </goals>
-                                <configuration>
-                                    <jvmArguments>-Dserver.port=${spring.boot.port}</jvmArguments>
-                                    <jmxPort>${jmx.port}</jmxPort>
-                                </configuration>
                             </execution>
                             <execution>
                                 <id>stop</id>
