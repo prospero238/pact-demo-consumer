@@ -244,7 +244,8 @@
                                     <goal>start</goal>
                                 </goals>
                                 <configuration>
-                                    <jvmArguments>-Dserver.port=${spring.boot.port} -Dcom.sun.management.jmxremote.port=${jmx.port}</jvmArguments>
+                                    <jvmArguments>-Dserver.port=${spring.boot.port}</jvmArguments>
+                                    <jmxPort>${jmx.port}</jmxPort>
                                 </configuration>
                             </execution>
                             <execution>
