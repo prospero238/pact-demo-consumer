@@ -237,6 +237,7 @@
                             <fork>true</fork>
                             <jvmArguments>-Dserver.port=${spring.boot.port}</jvmArguments>
                             <jmxPort>${jmx.port}</jmxPort>
+                            <wait>70000</wait>
                         </configuration>
                         <executions>
                             <execution>
