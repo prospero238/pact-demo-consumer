@@ -34,7 +34,7 @@ public class ConsumerTest {
     public PactFragment createAltFragment(PactDslWithProvider builder) {
 
         return builder
-                .uponReceiving("ExampleJavaConsumerPactRuleTest test interaction")
+                .uponReceiving("Request for color red")
                 .path("/color/red")
                 .method("GET")
                 .willRespondWith()
@@ -45,7 +45,7 @@ public class ConsumerTest {
     @Pact(provider = SHAPE_PROVIDER, consumer = "test_consumer")
     public PactFragment createFragment(PactDslWithProvider builder) {
         return builder
-                .uponReceiving("ExampleJavaConsumerPactRuleTest test interaction")
+                .uponReceiving("Request for shape of circle")
                 .path("/shape/circle")
                 .method("GET")
                 .willRespondWith()
